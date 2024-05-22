@@ -9,7 +9,7 @@ const Guess = ({ index, status, title }) => {
     
     switch (status) {   
         case 'correct':
-            symbol = <img src={discoBall} alt="Correct" className="ml-[3%] w-[6%] h-[50%]" />;
+            symbol = <img src={discoBall} alt="Correct" className="ml-[3%] w-[6%] h-[55%]" />;
             border = "sm:border-[2px] md:border-[4px] lg:border-[6px] border-lightOrange"
             break;
         case 'incorrect':
