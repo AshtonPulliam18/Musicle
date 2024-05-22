@@ -1,5 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Danfo&family=Quicksand:wght@300..700&display=swap');
+
 @tailwind base;
 
 @tailwind components;
 
 @tailwind utilities;
+
+@layer base {
+
+    @font-face {
+        font-family: Klemer;
+        font-weight: 500;
+        src: url(../src/assets/KlemerDisplayDemoRegular-ax5qg.ttf) format("truetype");
+    }
+}
+
+

@@ -2,7 +2,7 @@ import React from 'react';
 import Musicboard from './components/Musicboard';
 const App = () => {
     return (
-        <div className={"h-screen bg-sage grid grid-cols-2 gap-[10%]"}>
+        <div className={"h-screen bg-paleYellow grid grid-cols-2 gap-[10%]"}>
         {/* logo/title */}
         {/* guess/skip display */}
         {/* progress bar */}

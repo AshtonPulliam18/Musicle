@@ -1,29 +1,52 @@
 import React from 'react';
-import webicon from '../assets/webicon.png';
+import discoBall from '../assets/DiscoBall.png';
 
-const Guess = ({ status, title }) => {
+const Guess = ({ index, status, title }) => {
     let symbol;
-
-    switch (status) {
+    let color;
+    let border = "";
+    
+    
+    switch (status) {   
         case 'correct':
-            symbol = <img src={webicon} alt="Correct" className="w-[8%] h-[8%]" />;
+            symbol = <img src={discoBall} alt="Correct" className="ml-[3%] w-[6%] h-[50%]" />;
+            border = "sm:border-[2px] md:border-[4px] lg:border-[6px] border-lightOrange"
             break;
         case 'incorrect':
-            symbol = <span className="text-mauve text-3xl">X</span>;
+            symbol = <span className="ml-[3%] text-darkPurple text-3xl">X</span>;
             break;
         default:
-            symbol = <span className="border border-jade w-6 h-6 inline-block"></span>; // Empty box
+            symbol = <div className="ml-[3%] border-2 border-darkPurple w-[5%] h-[40%] rounded-md inline-block flex items-center"></div>; // Empty box
+    }
+    
+        
+    switch (index) {
+        case 1:
+            color = `bg-guess2 `;
+            break;
+        case 2:
+            color = `bg-guess3 `;
+            break;
+        case 3:
+            color = `bg-guess4 `;
+            break;
+        case 4:
+            color = `bg-guess5 `;
+            break;
+        case 5:
+            color = `bg-guess6 `;
+            break;
+        default:
+            color = `bg-guess1 `;
     }
     
     
-    return (
-        <div className="h-[55%] w-[90%] flex items-center p-[2%] border border-[2px] border-taupe">
-            <div className="mr-4 flex items-center"> {/* Container for symbol and title */}
-                {symbol}
-                <span className="text-taupe text-2xl ml-2">{title}</span> {/* Added ml-2 for spacing */}
-            </div>
-        </div>
-    );
+    
+    const track = <div className={"ml-[5%] font-sand text-2xl"}> {title}</div>;
+    const background = "h-[55%] w-[95%] flex items-center rounded-full " + color + border;
+    
+
+    return <div className={background}>{symbol}{track}</div>
 };
 
 export default Guess;
