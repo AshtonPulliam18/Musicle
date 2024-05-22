@@ -27,8 +27,9 @@ const generateGuesses = (num) => {
 };
 
 const Musicboard = () => {
-    const guesses = generateGuesses(5); // Generate 6 random guesses
+    
 
+    
     return (
         <div className={"h-[95%] w-[85%] bg-lightOrange border-solid sm:border-[3px] md:border-[6px] lg:border-[9px] border-darkOrange flex items-center justify-center"}>
             <div className={"h-[98%] w-[97%] bg-darkPink border-solid sm:border-[3px] md:border-[6px] lg:border-[9px] border-lightPink"}>
@@ -37,14 +38,8 @@ const Musicboard = () => {
                 <div className="h-[100%] w-[100%] grid grid-rows-6">
 
 
-                    {guesses.map((guess, i) => (
-                        <div key={i} className="flex items-center justify-center">
-                            <Guess index={guess.index} status={guess.status} title={guess.title}/>
-                        </div>))}
                     
-                    <div className="flex items-center justify-center">
-                        <Guess index={5} status={"correct"} title={"Happy Birthday - Your Husband"}/>
-                    </div>
+                    
 
 
                 </div>
