@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import Guess from './Guess';
 
 const generateRandomGuess = (i) => {
@@ -26,7 +26,7 @@ const generateGuesses = (num) => {
     return guesses;
 };
 
-const Musicboard = () => {
+const Musicboard = ({ guesses }) => {
     
 
     
@@ -36,11 +36,11 @@ const Musicboard = () => {
 
 
                 <div className="h-[100%] w-[100%] grid grid-rows-6">
-
-
-                    
-                    
-
+                    {guesses.map((guess, i) => (
+                        <div key={i} className="flex items-center justify-center">
+                            <Guess index={guess.index} status={guess.status} title={guess.title} />
+                        </div>
+                    ))}
 
                 </div>
             </div>
