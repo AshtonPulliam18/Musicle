@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Musicboard from './components/Musicboard';
 import GuessEntry from './components/GuessEntry.jsx';
 import Musicbar from './components/Musicbar.jsx';
-import logo from './assets/logo.png';
+import Logo from './components/Logo.jsx';
 
 const App = () => {
     const [guesses, setGuesses] = useState([]);
@@ -52,12 +52,15 @@ const App = () => {
         {/* skip button */}
         {/* submit button */}
             
-            <div className={"h-[100%] w-[100%] pt-[40%]"}>
-                {/*<div className="h-[15%] w-[100%] bg-darkYellow">*/}
-                {/*    <span className={"font-klemer w-[100%] h-[100%]"}>Musicle</span>*/}
-                {/*</div>*/}
-                <div className={"h-[25%] w-[100%]"}>
-                    <Musicbar progress={progress}/>
+            <div className={"h-[100%] w-[100%] relative"}>  
+
+                <div className="w-full flex ml-[30%] mt-[5%]">
+                    <Logo/>
+                </div>
+                <div className={"h-[60%] w-[100%] pt-[40%]"}>
+                    <div className={"h-[80%] w-[100%]"}>
+                        <Musicbar progress={progress}/>
+                    </div>
                 </div>
                 
                 <div className={"h-[50%] w-[100%]"}>
