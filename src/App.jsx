@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Musicboard from './components/Musicboard';
 import GuessEntry from './components/GuessEntry.jsx';
 import Musicbar from './components/Musicbar.jsx';
@@ -6,10 +6,14 @@ import Logo from './components/Logo.jsx';
 
 const App = () => {
     const [guesses, setGuesses] = useState([]);
-    const [progress, setProgress] = useState(6); // Initialize the progress state
+    const [progress, setProgress] = useState(6); 
+    const [target, setTarget] = useState(6);
+    const progressRef = useRef(progress); 
+    progressRef.current = progress;
+    
     let numSkips = 5;
     
-    // Function to handle skip, which will increase the progress
+
     const handleSkip = () => {
         switch (progress) {
             case 6:
@@ -30,15 +34,62 @@ const App = () => {
         }
         
     };
-    
+
+    const handlePlay = (targetValue) => {
+        setTarget(targetValue); 
+        setProgress(0); 
+    };
+
+    useEffect(() => {
+        if (progress === 0 && target > 0) {
+            const animateProgress = async (targetValue) => {
+                let duration;
+                switch (targetValue) {
+                    case 6:
+                        duration = 2000;
+                        break;
+                    case 13:
+                        duration = 4000;
+                        break;
+                    case 25:
+                        duration = 7000;
+                        break;
+                    case 47:
+                        duration = 13000;
+                        break;
+                    default:
+                        duration = 16000;
+                        break;
+                }
+
+                const stepDuration = 1000 / 60;
+                const steps = duration / stepDuration;
+                const increment = targetValue / steps;
+
+                for (let i = 0; i < steps; i++) {
+                    setProgress((prevProgress) => prevProgress + increment);
+                    await new Promise(resolve => setTimeout(resolve, stepDuration));
+                }
+
+                setProgress(targetValue);
+            };
+
+            animateProgress(target);
+        }
+    }, [progress, target]);
+
+
     const handleAddGuess = (title) => {
         if (guesses.length < 5) {
             const newGuess = {
-                index: guesses.length, // The new guess index
-                status: title === 'Skipped' ? 'skipped' : 'incorrect', // Adjust status based on title
+                index: guesses.length, 
+                status: title === 'Skipped' ? 'skipped' : 'incorrect', 
                 title: title,
             };
             setGuesses([...guesses, newGuess]);
+            if (newGuess.status === 'incorrect') {
+                handleSkip();
+            }
         }
     };
     
@@ -59,7 +110,7 @@ const App = () => {
                 </div>
                 <div className={"h-[60%] w-[100%] pt-[40%]"}>
                     <div className={"h-[80%] w-[100%]"}>
-                        <Musicbar progress={progress}/>
+                        <Musicbar progress={progress} playAnimation={handlePlay}/>
                     </div>
                 </div>
                 
