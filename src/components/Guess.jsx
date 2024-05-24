@@ -1,5 +1,5 @@
 import React from 'react';
-import discoBall from '../assets/DiscoBall.png';
+import discoBall from '../assets/discoBall.png';
 
 const Guess = ({ index, status, title }) => {
     let symbol;
@@ -42,7 +42,7 @@ const Guess = ({ index, status, title }) => {
     
     
     
-    const track = <div className={"ml-[5%] font-sand text-2xl"}> {title}</div>;
+    const track = <div className={"ml-[5%] font-sand text-2xl font-bold text-darkPurple"}> {title}</div>;
     const background = "h-[55%] w-[95%] flex items-center rounded-full " + color + border;
     
 

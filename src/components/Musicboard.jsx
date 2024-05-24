@@ -35,7 +35,7 @@ const Musicboard = ({ guesses }) => {
             <div className={"h-[98%] w-[97%] bg-darkPink border-solid sm:border-[3px] md:border-[6px] lg:border-[9px] border-lightPink"}>
 
 
-                <div className="h-[100%] w-[100%] grid grid-rows-6">
+                <div className="h-[100%] w-[100%] grid grid-rows-5">
                     {guesses.map((guess, i) => (
                         <div key={i} className="flex items-center justify-center">
                             <Guess index={guess.index} status={guess.status} title={guess.title} />
