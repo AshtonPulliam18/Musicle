@@ -13,7 +13,7 @@ const GuessEntry = ({ onAddGuess, onSkip }) => {
     };
 
     const handleSkip = () => {
-        onAddGuess('Skipped');
+        
         onSkip();
     };
     

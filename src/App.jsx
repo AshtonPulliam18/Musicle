@@ -8,36 +8,43 @@ const App = () => {
     const [guesses, setGuesses] = useState([]);
     const [progress, setProgress] = useState(6); 
     const [target, setTarget] = useState(6);
-    const progressRef = useRef(progress); 
+    const [playing, setPlaying] = useState(false);
+    
+    const progressRef = useRef(progress);
+    
     progressRef.current = progress;
     
     let numSkips = 5;
     
 
     const handleSkip = () => {
-        switch (progress) {
-            case 6:
-                setProgress(13);
-                break;
-            case 13:
-                setProgress(25);
-                break;
-            case 25:
-                setProgress(47);
-                break;
-            case 47:
-                setProgress(79);
-                break;
-            default:
-                setProgress(100);
-                break;
+        console.log(playing);
+        if (!playing) {
+            handleAddGuess("Skipped");
+            switch (progress) {
+                case 6:
+                    setProgress(13);
+                    break;
+                case 13:
+                    setProgress(25);
+                    break;
+                case 25:
+                    setProgress(47);
+                    break;
+                case 47:
+                    setProgress(79);
+                    break;
+                default:
+                    setProgress(100);
+                    break;
+            }
         }
-        
     };
 
     const handlePlay = (targetValue) => {
         setTarget(targetValue); 
-        setProgress(0); 
+        setProgress(0);
+        setPlaying(true);
     };
 
     useEffect(() => {
@@ -72,6 +79,7 @@ const App = () => {
                 }
 
                 setProgress(targetValue);
+                setPlaying(false);
             };
 
             animateProgress(target);
