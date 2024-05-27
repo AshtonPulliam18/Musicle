@@ -3,24 +3,24 @@ import Musicboard from './components/Musicboard';
 import GuessEntry from './components/GuessEntry.jsx';
 import Musicbar from './components/Musicbar.jsx';
 import Logo from './components/Logo.jsx';
+import record from "./assets/record.png";
 
 const App = () => {
     const [guesses, setGuesses] = useState([]);
-    const [progress, setProgress] = useState(6); 
+    const [progress, setProgress] = useState(6);
     const [target, setTarget] = useState(6);
     const [playing, setPlaying] = useState(false);
-    
-    const progressRef = useRef(progress);
-    
-    progressRef.current = progress;
-    
-    let numSkips = 5;
-    
 
-    const handleSkip = () => {
-        console.log(playing);
+    const progressRef = useRef(progress);
+
+    progressRef.current = progress;
+
+    let numSkips = 5;
+
+    const handleSkip = (skipped) => {
         if (!playing) {
-            handleAddGuess("Skipped");
+            if (skipped)
+               handleAddGuess("Skipped");
             switch (progress) {
                 case 6:
                     setProgress(13);
@@ -41,8 +41,8 @@ const App = () => {
         }
     };
 
-    const handlePlay = (targetValue) => {
-        setTarget(targetValue); 
+    const handlePlay = () => {
+        setTarget(progress);
         setProgress(0);
         setPlaying(true);
     };
@@ -86,12 +86,11 @@ const App = () => {
         }
     }, [progress, target]);
 
-
     const handleAddGuess = (title) => {
         if (guesses.length < 5) {
             const newGuess = {
-                index: guesses.length, 
-                status: title === 'Skipped' ? 'skipped' : 'incorrect', 
+                index: guesses.length,
+                status: title === 'Skipped' ? 'skipped' : 'incorrect',
                 title: title,
             };
             setGuesses([...guesses, newGuess]);
@@ -100,37 +99,37 @@ const App = () => {
             }
         }
     };
-    
-    
-    return (
-        <div className={"h-screen bg-paleYellow grid grid-cols-2"}>
-        {/* logo/title */}
-        {/* guess/skip display */}
-        {/* progress bar */}
-        {/* guess entry */}
-        {/* skip button */}
-        {/* submit button */}
-            
-            <div className={"h-[100%] w-[100%] relative"}>  
 
-                <div className="w-full flex ml-[30%] mt-[5%]">
-                    <Logo/>
-                </div>
-                <div className={"h-[60%] w-[100%] pt-[40%]"}>
-                    <div className={"h-[80%] w-[100%]"}>
-                        <Musicbar progress={progress} playAnimation={handlePlay}/>
-                    </div>
-                </div>
-                
-                <div className={"h-[50%] w-[100%]"}>
-                    <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip} />
-                </div>
+    return (
+        <div className="h-screen w-screen bg-paleYellow grid grid-cols-12 grid-rows-10 overflow-hidden">
+
+            {/* Logo/title */}
+            <div className="row-span-3 col-span-5 grid grid-rows-12">
+                <Logo/>
+                <div className="bg-darkOrange row-start-7 w-[30%] h-[50%] ml-[3%] rounded-md"/>
+                <div className="bg-lightOrange row-start-8 w-[50%] h-[50%] ml-[3%] rounded-md"/>
+                <div className="bg-darkOrange row-start-9 w-[80%] h-[50%] ml-[3%] rounded-md"/>
             </div>
-            
-            <div className={"flex items-center pr-[10%] justify-end"}>
-                    <Musicboard guesses={guesses}/>
+
+            {/* Musicbar */}
+            <div className="row-start-5 row-span-2 col-span-7">
+                <Musicbar progress={progress} />
             </div>
-            
+
+            {/* Play Button */}
+            <div className="row-start-7 row-span-1 col-span-7 relative">
+                <img onClick={handlePlay} src={record} className="w-[10%] h-[100%] ml-[45%] cursor-pointer" />
+            </div>
+
+            {/* Guess Entry */}
+            <div className="row-start-8 row-span-3 col-span-7">
+                <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip}/>
+            </div>
+
+            {/* Musicboard */}
+            <div className="row-start-1 row-span-10 col-start-8 col-span-5">
+                <Musicboard guesses={guesses}/>
+            </div>
         </div>
     );
 };

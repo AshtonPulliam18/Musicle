@@ -2,7 +2,7 @@ import React from 'react';
 
 const Logo = () => {
     return (
-        <div className="relative">
+        <div className="relative ml-[5%] mt-[2%]">
             <div className="relative">
                 <span
                 className="absolute text-9xl font-klemer font-bold text-lightOrange top-0 left-0 transform translate-x-[-3%]">Musicle</span>

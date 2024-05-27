@@ -16,7 +16,7 @@ const Guess = ({ index, status, title }) => {
             symbol = <span className="ml-[3%] text-darkPurple text-3xl">X</span>;
             break;
         default:
-            symbol = <div className="ml-[3%] border-2 border-darkPurple w-[5%] h-[40%] rounded-md inline-block flex items-center"></div>; // Empty box
+            symbol = <div className="ml-[3%] border-2 border-darkPurple w-[5%] h-[30%] rounded-md inline-block flex items-center"></div>; // Empty box
     }
     
         
