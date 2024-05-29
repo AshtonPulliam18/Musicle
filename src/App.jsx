@@ -6,16 +6,35 @@ import Logo from './components/Logo.jsx';
 import Authenticator from './components/Authenticator.jsx';
 import record from "./assets/record.png";
 import axios from "axios"
-import { usePlaybackState, useSpotifyPlayer } from "react-spotify-web-playback-sdk";
+
+const track = {
+    name: "",
+    album: {
+        images: [
+            { url: "" }
+        ]
+    },
+    artists: [
+        { name: "" }
+    ]
+}
 
 const App = () => {
     const [guesses, setGuesses] = useState([]);
     const [progress, setProgress] = useState(6);
     const [target, setTarget] = useState(6);
+    const [player, setPlayer] = useState(undefined);
     const [playing, setPlaying] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState("");
+    const [is_paused, setPaused] = useState(false);
+    const [is_active, setActive] = useState(false);
+    const [current_track, setTrack] = useState(track);
+
+
     
+    
+
     const progressRef = useRef(progress);
     progressRef.current = progress;
 
@@ -26,30 +45,70 @@ const App = () => {
     const scopes ="streaming user-read-email user-read-private user-modify-playback-state"
     
     
+        
     const handleAuthenticated = () => {
         window.open(`${auth_endpoint}?client_id=${client_id}&redirect_uri=${redirect}&response_type=token&scope=${scopes}`);
     }
-    
+
     useEffect(() => {
         const hash = window.location.hash;
-        let token = window.localStorage.getItem("token");
-        
-        
-        if (!token & hash) {
-            token = hash.substring(1).split("&").find(ele => ele.startsWith("access_token")).split("=")[1];
-            
-            window.location.hash = "";
-            window.localStorage.setItem("token", token);
-            setIsAuthenticated(true);
+        if (hash) {
+            const params = new URLSearchParams(hash.substring(1));
+            const accessToken = params.get('access_token');
+            if (accessToken) {
+                window.location.hash = "";
+                setToken(accessToken);
+                setIsAuthenticated(true);
+            }
         }
-        else if (token) {
-            window.location.hash = "";
-            setIsAuthenticated(true);
-        }
-        
-        setToken(token);
-    })
+    }, []);
+    
 
+
+    
+    useEffect(() => {
+        if (token) {
+            
+            
+            const script = document.createElement("script");
+            script.src = "https://sdk.scdn.co/spotify-player.js";
+            script.async = true;
+
+            document.body.appendChild(script);
+            
+            window.onSpotifyWebPlaybackSDKReady = async () => {
+                const player = new window.Spotify.Player({
+                    name: 'Web Playback SDK',
+                    getOAuthToken: cb => { cb(token); },
+                    volume: 0.5
+                });
+
+                setPlayer(player);
+
+                player.addListener('ready', ({ device_id }) => {
+                    console.log('Ready with Device ID', device_id);
+                });
+
+                player.addListener('not_ready', ({ device_id }) => {
+                    console.log('Device ID has gone offline', device_id);
+                });
+
+                player.addListener('player_state_changed', (state) => {
+                    if (!state) {
+                        return;
+                    }
+                    setTrack(state.track_window.current_track);
+                    setPaused(state.paused);
+                    player.getCurrentState().then(state => {
+                        setActive(!!state);
+                    });
+                });
+                
+
+                await player.connect();
+            };
+        }
+    }, [token]);
     
     
     let numSkips = 5;
@@ -79,9 +138,13 @@ const App = () => {
     };
 
     const handlePlay = async () => {
+        player.togglePlay().then(() => {
+            console.log('Toggled playback!');
+        });
             setTarget(progress);
             setProgress(0);
             setPlaying(true);
+            
     };
 
     useEffect(() => {
