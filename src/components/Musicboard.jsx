@@ -29,7 +29,7 @@ const generateGuesses = (num) => {
 const Musicboard = ({ guesses }) => {
 
     return (
-        <div className={"w-[90%] min-h-[800px] m-[40px] bg-lightOrange sm:border-[3px] md:border-[6px] lg:border-[9px] border-darkOrange flex items-center justify-center p-2"}>
+        <div className={"w-[90%] min-h-[660px] m-[40px] bg-lightOrange sm:border-[3px] md:border-[6px] lg:border-[9px] border-darkOrange flex items-center justify-center p-2"}>
             <div className={"h-[100%] w-[100%] bg-darkPink border-solid sm:border-[3px] md:border-[6px] lg:border-[9px] border-lightPink"}>
                 <div className="h-[100%] w-[100%] flex flex-col">
                     {guesses.map((guess, i) => (

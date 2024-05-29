@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{html,js,jsx}"],
   theme: {
     extend: {
+      backgroundImage: {
+        'custom-gradient-linear': 'linear-gradient(90deg, #be3fd0, #f12cb6, #ff2d96, #ff4975, #ff6e55, #ff9335, #ffb611, #ffd700)',
+      },
       colors: {
         'lightPink': '#E666BC',
         'darkPink': '#BE3FD0',

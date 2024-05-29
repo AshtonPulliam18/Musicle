@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 
 const Musicbar = ({progress}) => {
 
-    let progressBar = `h-[100%] bg-gradient-to-r from-darkPink to-lightYellow absolute top-0 left-0 z-0`;
+    let progressBar = `h-[100%] bg-custom-gradient-linear absolute top-0 left-0 z-0`;
 
     return (
         <div className="w-[100%] flex flex-col items-center">
@@ -20,8 +20,9 @@ const Musicbar = ({progress}) => {
                 <div
                     className="h-[70%] w-[2%] ml-[30%] bg-transparent border-0 border-l-[4px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10"/>
 
-                <div
-                    className={progressBar} style={{width: `${progress}%`}}/>
+                <div className={progressBar} style={{width: '100%'}}/>
+
+                <div className={"h-[100%] bg-paleYellow absolute top-0 right-0 z-0"} style={{width: `calc(100% - ${progress}%)`}}/>
 
             </div>
             <div className={"flex flex-row justify-between w-[90%]"}>

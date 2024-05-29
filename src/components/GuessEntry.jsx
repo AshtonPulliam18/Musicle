@@ -93,11 +93,11 @@ const GuessEntry = ({onAddGuess, onSkip, token}) => {
 
             <div className={"flex flex-row justify-between w-[70%]"}>
                 <button
-                    className={"p-2 sm:border-[2px] md:border-[2px] lg:border-[3px] border-lightYellow bg-lightOrange font-sand font-bold text-darkPurple text-xl rounded-lg"}
+                    className={"p-2 w-[100px] sm:border-[2px] md:border-[2px] lg:border-[3px] border-darkPurple bg-lightPink font-sand font-bold text-darkYellow text-xl rounded-lg"}
                     type="button" onClick={handleSkip}>Skip
                 </button>
                 <button
-                    className={" p-2 sm:border-[1px] md:border-[2px] lg:border-[3px] border-lightYellow bg-lightOrange font-sand font-bold text-darkPurple text-xl rounded-lg"}
+                    className={" p-2 w-[100px] sm:border-[1px] md:border-[2px] lg:border-[3px] border-darkPurple bg-lightPink font-sand font-bold text-darkYellow text-xl rounded-lg"}
                     type="button" onClick={handleSubmit}>Submit
                 </button>
             </div>
