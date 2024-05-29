@@ -299,7 +299,7 @@ const App = () => {
 
             {/* Guess Entry */}
             <div className="row-start-8 row-span-3 col-span-7">
-                <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip}/>
+                <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip} token={token} />
             </div>
 
             {/* Musicboard */}
