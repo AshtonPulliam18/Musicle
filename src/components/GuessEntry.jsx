@@ -3,15 +3,11 @@ import AsyncSelect from 'react-select/async';
 
 
 const GuessEntry = ({onAddGuess, onSkip, token}) => {
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        let v = inputValue.trim();
-        if (inputValue.trim() !== '') {
-            onAddGuess(inputValue);
-            setInputValue(''); // Clear input after submission
-        }
+        onAddGuess(inputValue);
     };
 
     const handleSkip = () => {
@@ -39,7 +35,14 @@ const GuessEntry = ({onAddGuess, onSkip, token}) => {
     };
 
     const formatOptionLabel = (data) => (
-        <div style={{display: 'flex', flexDirection: 'column', marginTop: '4px', marginBottom: '4px', backgroundColor: 'transparent', color: '#8742b0'}}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            marginTop: '4px',
+            marginBottom: '4px',
+            backgroundColor: 'transparent',
+            color: '#8742b0'
+        }}>
             <div>{data.name}</div>
             <div style={{fontSize: '12px'}}>
                 {data.artist}
@@ -48,9 +51,9 @@ const GuessEntry = ({onAddGuess, onSkip, token}) => {
     );
 
     return (
-        <div className={"h-[100%] w-[100%]"}>
+        <div className={"w-[100%] flex flex-col justify-center items-center gap-4 mt-4"}>
             <div
-                className="h-[20%] w-[70%] mt-[5%] ml-[15%] sm:border-[2px] md:border-[4px] lg:border-[6px] border-darkOrange flex items-center justify-center rounded-lg">
+                className="h-[50px] w-[70%] border-[2px] md:border-[4px] border-darkOrange flex items-center justify-center rounded-lg">
                 <AsyncSelect
                     defaultValue={null}
                     onChange={value => {
@@ -88,13 +91,13 @@ const GuessEntry = ({onAddGuess, onSkip, token}) => {
                 />
             </div>
 
-            <div className={"inline flex"}>
+            <div className={"flex flex-row justify-between w-[70%]"}>
                 <button
-                    className={"ml-[10%] mt-[2%] h-[3%] w-[9%] py-[1%] sm:border-[1px] md:border-[2px] lg:border-[3px] border-lightYellow bg-lightOrange font-sand font-bold text-darkPurple text-xl rounded-lg"}
+                    className={"p-2 sm:border-[2px] md:border-[2px] lg:border-[3px] border-lightYellow bg-lightOrange font-sand font-bold text-darkPurple text-xl rounded-lg"}
                     type="button" onClick={handleSkip}>Skip
                 </button>
                 <button
-                    className={"ml-[62%] mt-[2%] h-[3%] w-[9%] py-[1%] sm:border-[1px] md:border-[2px] lg:border-[3px] border-lightYellow bg-lightOrange font-sand font-bold text-darkPurple text-xl rounded-lg"}
+                    className={" p-2 sm:border-[1px] md:border-[2px] lg:border-[3px] border-lightYellow bg-lightOrange font-sand font-bold text-darkPurple text-xl rounded-lg"}
                     type="button" onClick={handleSubmit}>Submit
                 </button>
             </div>

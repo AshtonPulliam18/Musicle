@@ -27,17 +27,13 @@ const generateGuesses = (num) => {
 };
 
 const Musicboard = ({ guesses }) => {
-    
 
-    
     return (
-        <div className={"h-[90%] w-[80%] mt-[5%] ml-[10%] bg-lightOrange border-solid sm:border-[3px] md:border-[6px] lg:border-[9px] border-darkOrange flex items-center justify-center"}>
-            <div className={"h-[98%] w-[97%] bg-darkPink border-solid sm:border-[3px] md:border-[6px] lg:border-[9px] border-lightPink"}>
-
-
-                <div className="h-[100%] w-[100%] grid grid-rows-5">
+        <div className={"w-[90%] min-h-[800px] m-[40px] bg-lightOrange sm:border-[3px] md:border-[6px] lg:border-[9px] border-darkOrange flex items-center justify-center p-2"}>
+            <div className={"h-[100%] w-[100%] bg-darkPink border-solid sm:border-[3px] md:border-[6px] lg:border-[9px] border-lightPink"}>
+                <div className="h-[100%] w-[100%] flex flex-col">
                     {guesses.map((guess, i) => (
-                        <div key={i} className="flex items-center justify-center">
+                        <div key={i} className="flex items-center justify-center h-[120px]">
                             <Guess index={guess.index} status={guess.status} title={guess.title} />
                         </div>
                     ))}

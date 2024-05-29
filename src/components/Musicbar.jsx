@@ -1,37 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
 
 const Musicbar = ({progress}) => {
-    
 
     let progressBar = `h-[100%] bg-gradient-to-r from-darkPink to-lightYellow absolute top-0 left-0 z-0`;
-    
-    
 
-    
-    
     return (
-        <div className="h-[100%] w-[100%] relative">
+        <div className="w-[100%] flex flex-col items-center">
             <div
-                className="h-[40%] w-[90%] mt-[8%] ml-[5%] sm:border-[2px] md:border-[4px] lg:border-[6px] border-darkYellow border-double flex items-center relative"> {/* Make this relative too */}
-
+                className="h-[50px] w-[90%] border-[4px] md:border-[4px] lg:border-[6px] border-darkYellow border-double flex items-center relative"> {/* Make this relative too */}
                 <div
-                    className="h-[70%] w-[2%] ml-[5%] bg-transparent border-0 sm:border-l-[2px] md:border-l-[4px] lg:border-l-[6px]  border-double border-darkYellow z-10 "/>
+                    className="h-[70%] w-[2%] ml-[5%] bg-transparent border-0 border-l-[4px] md:border-l-[4px] lg:border-l-[6px]  border-double border-darkYellow z-10 "/>
                 <div
-                    className="h-[70%] w-[2%] ml-[5%] bg-transparent border-0 sm:border-l-[2px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10 "/>
+                    className="h-[70%] w-[2%] ml-[5%] bg-transparent border-0 border-l-[4px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10 "/>
                 <div
-                    className="h-[70%] w-[2%] ml-[10%] bg-transparent border-0 sm:border-l-[2px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10 "/>
+                    className="h-[70%] w-[2%] ml-[10%] bg-transparent border-0 border-l-[4px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10 "/>
                 <div
-                    className="h-[70%] w-[2%] ml-[20%] bg-transparent border-0 sm:border-l-[2px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10"/>
+                    className="h-[70%] w-[2%] ml-[20%] bg-transparent border-0 border-l-[4px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10"/>
                 <div
-                    className="h-[70%] w-[2%] ml-[30%] bg-transparent border-0 sm:border-l-[2px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10"/>
+                    className="h-[70%] w-[2%] ml-[30%] bg-transparent border-0 border-l-[4px] md:border-l-[4px] lg:border-l-[6px] border-double border-darkYellow z-10"/>
 
                 <div
                     className={progressBar} style={{width: `${progress}%`}}/>
 
             </div>
-            <span className={"font-sand font-bold text-darkPink ml-[5%]"}>0:00</span>
-            <span className={"font-sand font-bold text-darkPink ml-[83%]"}>0:16</span>
+            <div className={"flex flex-row justify-between w-[90%]"}>
+                <span className={"font-sand font-bold text-darkPink"}>0:00</span>
+                <span className={"font-sand font-bold text-darkPink"}>0:16</span>
+            </div>
         </div>
     );
 };

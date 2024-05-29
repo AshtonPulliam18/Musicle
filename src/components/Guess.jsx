@@ -9,14 +9,14 @@ const Guess = ({ index, status, title }) => {
     
     switch (status) {   
         case 'correct':
-            symbol = <img src={discoBall} alt="Correct" className="ml-[3%] w-[6%] h-[55%]" />;
+            symbol = <img src={discoBall} alt="Correct" className="ml-[12px] w-[20px] h-[20px]" />;
             border = "sm:border-[2px] md:border-[4px] lg:border-[6px] border-lightOrange"
             break;
         case 'incorrect':
             symbol = <span className="ml-[3%] text-darkPurple text-3xl">X</span>;
             break;
         default:
-            symbol = <div className="ml-[3%] border-2 border-darkPurple w-[5%] h-[30%] rounded-md inline-block flex items-center"></div>; // Empty box
+            symbol = <div className="ml-[3%] border-2 border-darkPurple w-[20px] h-[20px] rounded-md inline-block flex items-center"></div>; // Empty box
     }
     
         
@@ -42,8 +42,8 @@ const Guess = ({ index, status, title }) => {
     
     
     
-    const track = <div className={"ml-[5%] font-sand text-2xl font-bold text-darkPurple"}> {title}</div>;
-    const background = "h-[55%] w-[95%] flex items-center rounded-full " + color + border;
+    const track = <div className={"ml-[16px] font-sand text-2xl font-bold text-darkPurple"}> {title}</div>;
+    const background = "h-[55%] w-[90%] flex items-center rounded-full " + color + border;
     
 
     return <div className={background}>{symbol}{track}</div>

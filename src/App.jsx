@@ -1,21 +1,24 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, {useEffect, useState, useRef} from "react";
 import Musicboard from './components/Musicboard';
 import GuessEntry from './components/GuessEntry.jsx';
 import Musicbar from './components/Musicbar.jsx';
 import Logo from './components/Logo.jsx';
 import Authenticator from './components/Authenticator.jsx';
 import record from "./assets/record.png";
+import {useMediaQuery} from "react-responsive";
+import { useSpring, animated } from 'react-spring';
+
 
 const track = {
-    id: "", 
+    id: "",
     name: "",
     album: {
         images: [
-            { url: "" }
+            {url: ""}
         ]
     },
     artists: [
-        { name: "" }
+        {name: ""}
     ]
 }
 
@@ -32,7 +35,19 @@ const App = () => {
     const [current_track, setTrack] = useState(track);
     const [selectedTrack, setSelectedTrack] = useState(track);
     const [deviceId, setDeviceId] = useState("");
-    
+
+    const playButtonRotation = useSpring({
+        from: {rotate: 0},
+        to: {rotate: playing ? 360 : 0},
+        loop: true,
+        config: {
+            duration: playing ? 3000 : 0,
+            easing: t => t,
+        }
+    })
+
+    const isBigScreen = useMediaQuery({query: '(min-width: 1000px)'});
+
     const progressRef = useRef(progress);
     progressRef.current = progress;
 
@@ -41,9 +56,9 @@ const App = () => {
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
     const redirect = "http://localhost:5173/callback";
-    const scopes ="streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
-    
-       
+    const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
+
+
     const handleAuthenticated = () => {
         window.open(`${auth_endpoint}?client_id=${client_id}&redirect_uri=${redirect}&response_type=token&scope=${scopes}`);
     }
@@ -60,62 +75,60 @@ const App = () => {
             }
         }
     }, []);
-    
 
 
-    
     useEffect(() => {
         if (token) {
-            
-            
+
+
             const script = document.createElement("script");
             script.src = "https://sdk.scdn.co/spotify-player.js";
             script.async = true;
 
             document.body.appendChild(script);
-            
+
             window.onSpotifyWebPlaybackSDKReady = async () => {
                 const player = new window.Spotify.Player({
                     name: 'Web Playback SDK',
-                    getOAuthToken: cb => { cb(token); },
+                    getOAuthToken: cb => {
+                        cb(token);
+                    },
                     volume: 0.5
                 });
 
                 setPlayer(player);
 
-                player.addListener('ready', ({ device_id }) => {
+                player.addListener('ready', ({device_id}) => {
                     setDeviceId(device_id);
                     console.log('Ready with Device ID', device_id);
                 });
 
-                player.addListener('not_ready', ({ device_id }) => {
+                player.addListener('not_ready', ({device_id}) => {
                     console.log('Device ID has gone offline', device_id);
                 });
 
-                // player.addListener('player_state_changed', (state) => {
-                //     if (!state) {
-                //         return;
-                //     }
-                //     setTrack(state.track_window.current_track);
-                //     setPaused(state.paused);
-                //     player.getCurrentState().then(state => {
-                //         setActive(!!state);
-                //     });
-                // });
-                
+                player.addListener('player_state_changed', (state) => {
+                    if (!state) {
+                        return;
+                    }
+                    setTrack(state.track_window.current_track);
+                    setPaused(state.paused);
+                    player.getCurrentState().then(state => {
+                        setActive(!!state);
+                    });
+                });
 
                 await player.connect();
             };
         }
     }, [token]);
-    
-    
+
     let numSkips = 5;
 
     const handleSkip = (skipped) => {
         if (!playing) {
             if (skipped)
-               handleAddGuess("Skipped");
+                handleAddGuess("Skipped");
             switch (progress) {
                 case 6:
                     setProgress(13);
@@ -183,49 +196,16 @@ const App = () => {
     };
 
 
-
     const getPlaybackState = async () => {
-
         const response = await fetch('https://api.spotify.com/v1/me/player', {
             headers: {
                 Authorization: 'Bearer ' + token
             }
         });
-        
+
         // Return false indicating playback wasn't active on device
         if (response.status === 204) return false;
         return true;
-    };
-    
-    
-    
-    const getRandomSongFromPlaylist = async (playlistId) => {
-        const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        });
-        
-        const data = await response.json();
-        
-        const randomIndex = Math.floor(Math.random() * (data["tracks"]["items"].length - 1));
-        const id = data["tracks"]["items"][randomIndex]["track"]["id"];
-        const name = data["tracks"]["items"][randomIndex]["track"]["name"];
-        const album = data["tracks"]["items"][randomIndex]["track"]["album"]["name"];
-        
-        let artists = "";
-        for (let artist of data["tracks"]["items"][randomIndex]["track"]["artists"]) {
-            artists += artist["name"] + " ";
-        }
-        
-        const selected =  {
-            id: id, 
-            name: name,
-            album: album,
-            artists: artists,
-        };
-        console.log("Track retrieved: " + JSON.stringify(selected));
-        return selected;
     };
 
 
@@ -247,7 +227,7 @@ const App = () => {
             console.error('Error adding track to queue:', error);
         }
     };
-    
+
     const SkipTrack = async () => {
         const response = await fetch(`https://api.spotify.com/v1/me/player/next`, {
             method: 'POST',
@@ -255,7 +235,7 @@ const App = () => {
                 Authorization: 'Bearer ' + token
             }
         });
-        
+
         console.log(response.status)
     }
 
@@ -282,8 +262,37 @@ const App = () => {
             console.error('Error setting volume:', error);
         }
     };
-    
-    
+
+    const getRandomSongFromPlaylist = async (playlistId) => {
+        const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        });
+
+        const data = await response.json();
+
+        const randomIndex = Math.floor(Math.random() * (data["tracks"]["items"].length - 1));
+        const id = data["tracks"]["items"][randomIndex]["track"]["id"];
+        const name = data["tracks"]["items"][randomIndex]["track"]["name"];
+        const album = data["tracks"]["items"][randomIndex]["track"]["album"]["name"];
+
+        let artists = "";
+        for (let artist of data["tracks"]["items"][randomIndex]["track"]["artists"]) {
+            artists += artist["name"] + " ";
+        }
+
+        const selected =  {
+            id: id,
+            name: name,
+            album: album,
+            artists: artists,
+        };
+        console.log("Track retrieved: " + JSON.stringify(selected));
+        return selected;
+    };
+
+
     const handlePlay = async () => {
         if (!await getPlaybackState()) {
             transferPlayback(deviceId)
@@ -306,94 +315,120 @@ const App = () => {
         }
     };
 
-    
-    
-    useEffect(() => {
-        if (progress === 0 && target > 0) {
-            const animateProgress = async (targetValue) => {
-                let duration;
-                switch (targetValue) {
-                    case 6:
-                        duration = 2000;
-                        break;
-                    case 13:
-                        duration = 4000;
-                        break;
-                    case 25:
-                        duration = 7000;
-                        break;
-                    case 47:
-                        duration = 13000;
-                        break;
-                    default:
-                        duration = 16000;
-                        break;
-                }
 
-                const stepDuration = 1000 / 60;
-                const steps = duration / stepDuration;
-                const increment = targetValue / steps;
+        useEffect(() => {
+            if (progress === 0 && target > 0) {
+                const animateProgress = async (targetValue) => {
+                    let duration;
+                    switch (targetValue) {
+                        case 6:
+                            duration = 2000;
+                            break;
+                        case 13:
+                            duration = 4000;
+                            break;
+                        case 25:
+                            duration = 7000;
+                            break;
+                        case 47:
+                            duration = 13000;
+                            break;
+                        default:
+                            duration = 16000;
+                            break;
+                    }
 
-                for (let i = 0; i < steps; i++) {
-                    setProgress((prevProgress) => prevProgress + increment);
-                    await new Promise(resolve => setTimeout(resolve, stepDuration));
-                }
+                    const stepDuration = 1000 / 60;
+                    const steps = duration / stepDuration;
+                    const increment = targetValue / steps;
 
-                setProgress(targetValue);
-                setPlaying(false);
-            };
+                    for (let i = 0; i < steps; i++) {
+                        setProgress((prevProgress) => prevProgress + increment);
+                        await new Promise(resolve => setTimeout(resolve, stepDuration));
+                    }
 
-            animateProgress(target);
-        }
-    }, [progress, target]);
+                    setProgress(targetValue);
+                    setPlaying(false);
+                };
 
-    const handleAddGuess = (title) => {
-        if (guesses.length < 5) {
-            const newGuess = {
-                index: guesses.length,
-                status: title === 'Skipped' ? 'skipped' : 'incorrect',
-                title: title,
-            };
-            setGuesses([...guesses, newGuess]);
-            if (newGuess.status === 'incorrect') {
-                handleSkip();
+                animateProgress(target);
             }
-        }
-    };
+        }, [progress, target]);
 
-    return (
-        <div className="h-screen w-screen bg-paleYellow grid grid-cols-12 grid-rows-10 overflow-hidden">
-            
-            {/* Logo/title */}
-            <div className="row-span-3 col-span-5 grid grid-rows-12">
+        const handleAddGuess = (title) => {
+            if (guesses.length < 5) {
+                const newGuess = {
+                    index: guesses.length,
+                    status: title === 'Skipped' ? 'skipped' : 'incorrect',
+                    title: title,
+                };
+                setGuesses([...guesses, newGuess]);
+                if (newGuess.status === 'incorrect') {
+                    handleSkip();
+                }
+            }
+        };
+
+        const logo = () => (
+            <div className="w-[50%] h-[120px] md:h-[250px] flex flex-col gap-3">
                 <Logo/>
-                <div className="bg-darkOrange row-start-7 w-[30%] h-[50%] ml-[3%] rounded-md"/>
-                <div className="bg-lightOrange row-start-8 w-[50%] h-[50%] ml-[3%] rounded-md"/>
-                <div className="bg-darkOrange row-start-9 w-[80%] h-[50%] ml-[3%] rounded-md"/>
+                <div className="bg-darkOrange w-[30%] h-[10px] ml-[12px] rounded-md"/>
+                <div className="bg-lightOrange w-[50%] h-[10px] ml-[12px] rounded-md"/>
+                <div className="bg-darkOrange w-[80%] h-[10px] ml-[12px] rounded-md"/>
             </div>
-            
-            <Authenticator onAuthenticate={handleAuthenticated} isEnabled={!isAuthenticated}/>
-             {/* Musicbar */}
-            <div className="row-start-5 row-span-2 col-span-7">
-                <Musicbar progress={progress} />
-            </div>
+        );
 
-            {/* Play Button */}
-            <div className="row-start-7 row-span-1 col-span-7 relative">
-                <img onClick={handlePlay} src={record} className="w-[9%] h-[100%] ml-[45%] cursor-pointer" />
-            </div>
+        const playButton = () => (
+            <animated.div
+                style={{
+                    ...playButtonRotation,
+                }}
+                className="w-[100%] h-[100px] flex justify-center">
+                <img onClick={handlePlay} src={record} className="w-[100px] cursor-pointer"/>
+            </animated.div>
+        );
 
-            {/* Guess Entry */}
-            <div className="row-start-8 row-span-3 col-span-7">
-                <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip} token={token} />
-            </div>
-
-            {/* Musicboard */}
-            <div className="row-start-1 row-span-10 col-start-8 col-span-5">
+        const musicBoard = () => (
+            <div className={"w-[100%] flex justify-center"}>
                 <Musicboard guesses={guesses}/>
             </div>
-        </div>
-    );
-};
+        );
+
+        const layout = () => {
+            if (isBigScreen) {
+                return (<div className={"flex flex-row w-screen h-screen"}>
+                    <div className={"grow"}>
+                        {logo()}
+                        <Musicbar progress={progress}/>
+                        {playButton()}
+                        <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip} token={token}/>
+                    </div>
+                    <div className={"grow"}>
+                        {musicBoard()}
+                    </div>
+                </div>);
+            } else {
+                return (
+                    <>
+                        {logo()}
+                        <Musicbar progress={progress}/>
+                        {playButton()}
+                        <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip} token={token}/>
+                        {musicBoard()}
+                    </>
+                );
+            }
+        };
+
+        return (
+            <div className={"min-h-screen h-screen w-screen bg-paleYellow flex"}>
+                <div className="flex grow flex-col justify-start items-start gap-6 overflow-auto">
+                    <Authenticator onAuthenticate={handleAuthenticated} isEnabled={!isAuthenticated}/>
+                    {layout()}
+                </div>
+            </div>
+        );
+
+}
 
 export default App;
