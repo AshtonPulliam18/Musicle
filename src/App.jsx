@@ -5,7 +5,6 @@ import Musicbar from './components/Musicbar.jsx';
 import Logo from './components/Logo.jsx';
 import Authenticator from './components/Authenticator.jsx';
 import record from "./assets/record.png";
-import axios from "axios"
 
 const track = {
     name: "",
@@ -30,10 +29,7 @@ const App = () => {
     const [is_paused, setPaused] = useState(false);
     const [is_active, setActive] = useState(false);
     const [current_track, setTrack] = useState(track);
-
-
-    
-    
+    const [deviceId, setDeviceId] = useState("");
 
     const progressRef = useRef(progress);
     progressRef.current = progress;
@@ -42,10 +38,9 @@ const App = () => {
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
     const redirect = "http://localhost:5173/callback";
-    const scopes ="streaming user-read-email user-read-private user-modify-playback-state"
+    const scopes ="streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
     
-    
-        
+       
     const handleAuthenticated = () => {
         window.open(`${auth_endpoint}?client_id=${client_id}&redirect_uri=${redirect}&response_type=token&scope=${scopes}`);
     }
@@ -86,6 +81,7 @@ const App = () => {
                 setPlayer(player);
 
                 player.addListener('ready', ({ device_id }) => {
+                    setDeviceId(device_id);
                     console.log('Ready with Device ID', device_id);
                 });
 
@@ -137,7 +133,84 @@ const App = () => {
         }
     };
 
+    const getAvailableDevices = async () => {
+        try {
+            const response = await fetch('https://api.spotify.com/v1/me/player/devices', {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            });
+
+            if (!response.ok) {
+                console.log(response.statusText);
+            }
+
+            const devicesData = await response.json();
+            setDeviceId(devicesData.devices[0].id);
+
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+        }
+    };
+
+    const transferPlayback = async (newDeviceId) => {
+        try {
+            const response = await fetch('https://api.spotify.com/v1/me/player', {
+                method: 'PUT',
+                headers: {
+                    Authorization: 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    device_ids: [newDeviceId],
+                    play: true
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to transfer playback');
+            }
+
+            console.log('Playback transferred successfully');
+        } catch (error) {
+            console.error('Error transferring playback:', error);
+        }
+    };
+
+
+
+    const getPlaybackState = async () => {
+
+        const response = await fetch('https://api.spotify.com/v1/me/player', {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        });
+        
+        // Return false indicating playback wasn't active on device
+        if (response.status === 204) return false;
+        return true;
+    };
+    
+    
+    const getFeaturedPlaylists = async (locale, limit, offset) => {
+        const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        });
+    }
+
+    
+    
+    
     const handlePlay = async () => {
+        await searchTracks("how to l");
+        if (!await getPlaybackState())
+            await transferPlayback(deviceId);
+        else
+            console.log("Playback was ready!")
+        
         player.togglePlay().then(() => {
             console.log('Toggled playback!');
         });
@@ -147,6 +220,8 @@ const App = () => {
             
     };
 
+    
+    
     useEffect(() => {
         if (progress === 0 && target > 0) {
             const animateProgress = async (targetValue) => {
