@@ -7,6 +7,7 @@ import Authenticator from './components/Authenticator.jsx';
 import record from "./assets/record.png";
 
 const track = {
+    id: "", 
     name: "",
     album: {
         images: [
@@ -29,11 +30,13 @@ const App = () => {
     const [is_paused, setPaused] = useState(false);
     const [is_active, setActive] = useState(false);
     const [current_track, setTrack] = useState(track);
+    const [selectedTrack, setSelectedTrack] = useState(track);
     const [deviceId, setDeviceId] = useState("");
-
+    
     const progressRef = useRef(progress);
     progressRef.current = progress;
 
+    const globalTopFiftyId = "37i9dQZEVXbMDoHDwVN2tF";
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
@@ -89,16 +92,16 @@ const App = () => {
                     console.log('Device ID has gone offline', device_id);
                 });
 
-                player.addListener('player_state_changed', (state) => {
-                    if (!state) {
-                        return;
-                    }
-                    setTrack(state.track_window.current_track);
-                    setPaused(state.paused);
-                    player.getCurrentState().then(state => {
-                        setActive(!!state);
-                    });
-                });
+                // player.addListener('player_state_changed', (state) => {
+                //     if (!state) {
+                //         return;
+                //     }
+                //     setTrack(state.track_window.current_track);
+                //     setPaused(state.paused);
+                //     player.getCurrentState().then(state => {
+                //         setActive(!!state);
+                //     });
+                // });
                 
 
                 await player.connect();
@@ -154,6 +157,7 @@ const App = () => {
     };
 
     const transferPlayback = async (newDeviceId) => {
+        console.log(newDeviceId)
         try {
             const response = await fetch('https://api.spotify.com/v1/me/player', {
                 method: 'PUT',
@@ -163,11 +167,12 @@ const App = () => {
                 },
                 body: JSON.stringify({
                     device_ids: [newDeviceId],
-                    play: true
+                    play: false
                 })
             });
 
             if (!response.ok) {
+                console.log(response.statusText)
                 throw new Error('Failed to transfer playback');
             }
 
@@ -193,31 +198,112 @@ const App = () => {
     };
     
     
-    const getFeaturedPlaylists = async (locale, limit, offset) => {
-        const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
+    
+    const getRandomSongFromPlaylist = async (playlistId) => {
+        const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
             headers: {
                 Authorization: 'Bearer ' + token
             }
         });
+        
+        const data = await response.json();
+        
+        const randomIndex = Math.floor(Math.random() * (data["tracks"]["items"].length - 1));
+        const id = data["tracks"]["items"][randomIndex]["track"]["id"];
+        const name = data["tracks"]["items"][randomIndex]["track"]["name"];
+        const album = data["tracks"]["items"][randomIndex]["track"]["album"]["name"];
+        
+        let artists = "";
+        for (let artist of data["tracks"]["items"][randomIndex]["track"]["artists"]) {
+            artists += artist["name"] + " ";
+        }
+        
+        const selected =  {
+            id: id, 
+            name: name,
+            album: album,
+            artists: artists,
+        };
+        console.log("Track retrieved: " + JSON.stringify(selected));
+        return selected;
+    };
+
+
+    const addTrackToQueue = async (trackId) => {
+        try {
+            const response = await fetch(`https://api.spotify.com/v1/me/player/queue?uri=spotify:track:${trackId}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            });
+
+            if (!response.ok) {
+                console.log("Failed queue: " + response.status);
+            }
+
+            console.log('Track added to queue');
+        } catch (error) {
+            console.error('Error adding track to queue:', error);
+        }
+    };
+    
+    const SkipTrack = async () => {
+        const response = await fetch(`https://api.spotify.com/v1/me/player/next`, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        });
+        
+        console.log(response.status)
     }
 
-    
+
+    const setVolume = async (volumePercent) => {
+        try {
+            const response = await fetch('https://api.spotify.com/v1/me/player/volume', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    volume_percent: volumePercent
+                })
+            });
+
+            if (!response.ok) {
+                console.log(response.statusText)
+            }
+
+            console.log('Volume set to', volumePercent);
+        } catch (error) {
+            console.error('Error setting volume:', error);
+        }
+    };
     
     
     const handlePlay = async () => {
-        await searchTracks("how to l");
-        if (!await getPlaybackState())
-            await transferPlayback(deviceId);
-        else
-            console.log("Playback was ready!")
-        
-        player.togglePlay().then(() => {
-            console.log('Toggled playback!');
-        });
+        if (!await getPlaybackState()) {
+            transferPlayback(deviceId)
+            const selected = await getRandomSongFromPlaylist(globalTopFiftyId);
+            await addTrackToQueue(selected.id);
+            player.togglePlay().then(() => {
+                console.log('Toggled playback!');
+            });
+            await SkipTrack();
+        }
+        else if (!playing) {
+            console.log(playing)
             setTarget(progress);
             setProgress(0);
             setPlaying(true);
-            
+
+            player.togglePlay().then(() => {
+                console.log('Toggled playback!');
+            });
+        }
     };
 
     
