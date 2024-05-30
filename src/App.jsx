@@ -101,8 +101,8 @@ const App = () => {
                 
 
                 player.addListener('ready', ({device_id}) => {
+                    console.log('Ready with Device ID', device_id);
                     setDeviceId(device_id);
-
                 });
 
                 player.addListener('player_state_changed', ( state => {
