@@ -57,7 +57,7 @@ const App = () => {
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
-    const redirect = "https://musicle-seven.vercel.app"; // "http://localhost:5173/callback"; //"https://musicle-seven.vercel.app";
+    const redirect = "https://musicle-seven.vercel.app"; //"http://localhost:5173/callback"; //"https://musicle-seven.vercel.app";
     const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
 
 
@@ -98,14 +98,31 @@ const App = () => {
                     volume: 0.5
                 });
 
-                setPlayer(player);
+                
 
                 player.addListener('ready', ({device_id}) => {
                     setDeviceId(device_id);
 
                 });
-                
 
+                player.addListener('player_state_changed', ( state => {
+
+                    if (!state) {
+                        return;
+                    }
+
+                    setTrack(state.track_window.current_track);
+                    setPaused(state.paused);
+
+
+                    player.getCurrentState().then( state => {
+                        (!state)? setActive(false) : setActive(true)
+                    });
+                    
+    
+                }));
+                
+                setPlayer(player);
                 await player.connect();
             };
         }
