@@ -57,7 +57,7 @@ const App = () => {
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
-    const redirect = "https://musicle-seven.vercel.app";
+    const redirect =  "https://musicle-seven.vercel.app"; //"http://localhost:5173/callback";
     const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
 
 
@@ -413,7 +413,7 @@ const App = () => {
                     <div className={"grow"}>
                         {logo()}
                         <Musicbar progress={progress}/>
-                        {deviceId ? playButton() : <div/>}
+                        {playButton()}
                         <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip} token={token}/>
                     </div>
                     <div className={"grow"}>
@@ -438,7 +438,7 @@ const App = () => {
                 <div className="flex grow flex-col justify-start items-start gap-6 overflow-auto">
                     <Authenticator onAuthenticate={handleAuthenticated} isEnabled={!isAuthenticated}/>
                     <Result song={selectedTrack} status={gameStatus}/>
-                    {layout()}
+                    {isAuthenticated ? deviceId ? layout() : <div className={"bg-paleYellow"}/> :  layout()}
                 </div>
             </div>
         );
