@@ -3,11 +3,13 @@ import AsyncSelect from 'react-select/async';
 
 
 const GuessEntry = ({onAddGuess, onSkip, token}) => {
-    const [inputValue, setInputValue] = useState(null);
+    const [inputValue, setInputValue] = useState('');
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        onAddGuess(inputValue);
+        if (inputValue.id !== undefined && inputValue.name !== undefined) { 
+            onAddGuess(inputValue);
+            setInputValue('');
+        }// Clear input after submission
     };
 
     const handleSkip = () => {
