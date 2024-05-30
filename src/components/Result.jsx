@@ -1,8 +1,12 @@
 import React from 'react';
 
-const Result = ({status, isEnabled}) => {
-    if (!isEnabled) return null;
-
+const Result = ({song, status}) => {
+    if (status === "in-progress") return null;
+    
+    const message = status === "victory" ? "Right on! The song was..." : "You couldn't dig it. The song was...";
+    
+    
+    
     const doSum = () => {
         return;
     }
@@ -11,14 +15,12 @@ const Result = ({status, isEnabled}) => {
 
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
             <div className="bg-lightPink p-8 rounded-lg text-center text-darkYellow font-sand shadow-lg">
-                <h2 className="mb-6 text-xl">You did it! Come back tommorrow for more grooves!</h2>
-                <button
-                    className="bg-darkYellow text-darkPink font-sand py-2 px-6 rounded"
-                    onClick={doSum}
-
-                >
-                    Okay
-                </button>
+                <h2 className="mb-6 text-xl font-bold font-sand">{message}</h2>
+                <h2 className="text-md font-sand">{song.name} - {song.artist}</h2>
+                <div className="flex items-center justify-center m-[12px]">
+                    <img src={song.img} className="h-[40%] w-[40%] rounded-lg"/>
+                </div>
+                <h2 className="mb-6 text-xl font-bold">Come back tommorrow for a new groove!</h2>
             </div>
         </div>
     );

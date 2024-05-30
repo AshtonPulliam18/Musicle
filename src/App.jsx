@@ -34,7 +34,9 @@ const App = () => {
     const [current_track, setTrack] = useState(track);
     const [selectedTrack, setSelectedTrack] = useState(track);
     const [deviceId, setDeviceId] = useState("");
-
+    const [gameStatus, setGameStatus] = useState("in-progress");
+    
+    
     const playButtonRotation = useSpring({
         from: {rotate: 0},
         to: {rotate: playing ? 360 : 0},
@@ -51,6 +53,7 @@ const App = () => {
     progressRef.current = progress;
 
     const globalTopFiftyId = "37i9dQZEVXbMDoHDwVN2tF";
+    
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
@@ -88,7 +91,7 @@ const App = () => {
 
             window.onSpotifyWebPlaybackSDKReady = async () => {
                 const player = new window.Spotify.Player({
-                    name: 'Web Playback SDK',
+                    name: 'Musicle Playback',
                     getOAuthToken: cb => {
                         cb(token);
                     },
@@ -99,12 +102,9 @@ const App = () => {
 
                 player.addListener('ready', ({device_id}) => {
                     setDeviceId(device_id);
-                    console.log('Ready with Device ID', device_id);
-                });
 
-                player.addListener('not_ready', ({device_id}) => {
-                    console.log('Device ID has gone offline', device_id);
                 });
+                
 
                 await player.connect();
             };
@@ -145,10 +145,7 @@ const App = () => {
                     Authorization: 'Bearer ' + token
                 }
             });
-
-            if (!response.ok) {
-                console.log(response.statusText);
-            }
+            
 
             const devicesData = await response.json();
             setDeviceId(devicesData.devices[0].id);
@@ -159,7 +156,6 @@ const App = () => {
     };
 
     const transferPlayback = async (newDeviceId) => {
-        console.log(newDeviceId)
         try {
             const response = await fetch('https://api.spotify.com/v1/me/player', {
                 method: 'PUT',
@@ -174,11 +170,9 @@ const App = () => {
             });
 
             if (!response.ok) {
-                console.log(response.statusText)
                 throw new Error('Failed to transfer playback');
             }
-
-            console.log('Playback transferred successfully');
+            
         } catch (error) {
             console.error('Error transferring playback:', error);
         }
@@ -206,22 +200,22 @@ const App = () => {
             }
         });
         
+  
         const data = await response.json();
         const randomIndex = Math.floor(Math.random() * (data["tracks"]["items"].length - 1));
         const id = data["tracks"]["items"][randomIndex]["track"]["id"];
         const name = data["tracks"]["items"][randomIndex]["track"]["name"];
         const album = data["tracks"]["items"][randomIndex]["track"]["album"]["name"];
         const artist =  data["tracks"]["items"][randomIndex]["track"]["artists"][0]["name"];
-        
-  
+        const selectedAlbumCover =  data["tracks"]["items"][randomIndex]["track"]["album"]["images"][0]["url"];
         
         const selected =  {
             id: id, 
             name: name,
             album: album,
             artist: artist,
+            img: selectedAlbumCover
         };
-        console.log("Track retrieved: " + JSON.stringify(selected));
         return selected;
     };
 
@@ -234,79 +228,89 @@ const App = () => {
                     Authorization: 'Bearer ' + token
                 }
             });
-
-            if (!response.ok) {
-                console.log("Failed queue: " + response.status);
-            }
-
-            console.log('Track added to queue');
+            
+            
         } catch (error) {
             console.error('Error adding track to queue:', error);
         }
     };
 
-    const SkipTrack = async () => {
-        const response = await fetch(`https://api.spotify.com/v1/me/player/next`, {
-            method: 'POST',
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        });
 
-        console.log(response.status)
+    const playSong = async (trackId) => {
+        try {
+            const response = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + deviceId, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    uris: [`spotify:track:${trackId}`]
+                })
+            });
+            console.log(await response.json());
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    };
+    
+    const SkipTrack = async () => {
+        await player.nextTrack();
     }
 
 
     const pauseTrack = async () => {
-        const response = await fetch('https://api.spotify.com/v1/me/player/pause', {
-            method: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            console.log(response.statusText)
-        }
-        
+        await player.pause();
     };
 
-    const seekToPosition = async (position) => {
-        const response = await fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${position}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        });
-
-        if (!response.ok) {
-            console.log(response.statusText);
-        }
+    const seekToPosition = async (ms) => {
+        // const response = await fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${ms}`, {
+        //     method: 'PUT',
+        //     headers: {
+        //         'Authorization': 'Bearer ' + token
+        //     }
+        // });
+        await player.seek(ms);
     };
     
+    const intializePlayback = async () => {
+        await transferPlayback(deviceId);
+        
+        let savedTrack = JSON.parse(localStorage.getItem("savedTrack"));
+        
+        const now = new Date();
+        let selected;
+        if (savedTrack && now - new Date(savedTrack.timestamp) < 86400000) { // 86400000 ms = 24 hours
+            selected = savedTrack.track;
+            setSelectedTrack(selected);
+
+            setTarget(progress);
+            setProgress(0);
+            
+        }
+        else {
+            selected = await getRandomSongFromPlaylist(globalTopFiftyId);
+            setSelectedTrack(selected);
+
+            localStorage.setItem("savedTrack", JSON.stringify({ track: selected, timestamp: new Date() }));
+            
+            setTarget(progress);
+            setProgress(0);
+        }
+        await playSong(selected.id);
+    }
     
     const handlePlay = async () => {
         if (!playing) {
-            if (!await getPlaybackState()) {
-                transferPlayback(deviceId)
-                const selected = await getRandomSongFromPlaylist(globalTopFiftyId);
-                await addTrackToQueue(selected.id);
-                await SkipTrack();
-                setSelectedTrack(selected);
-
+            setPlaying(true);
+            
+            if (selectedTrack.id === "")
+                await intializePlayback();
+            else {
                 setTarget(progress);
                 setProgress(0);
-                setPlaying(!playing);
-
-            } else {
-                setTarget(progress);
-                setProgress(0);
-                setPlaying(!playing);
-
-                player.togglePlay().then(() => {
-                    console.log('Toggled playback!');
-                });
+                
+                await player.togglePlay();
             }
         }
     };
@@ -344,9 +348,9 @@ const App = () => {
                     }
 
                 setProgress(targetValue);
-                setPlaying(false);
                 await pauseTrack();
                 await seekToPosition(0);
+                setPlaying(false);
             };
 
             animateProgress(target);
@@ -354,10 +358,6 @@ const App = () => {
     }, [progress, target]);
 
     const handleAddGuess = (guess) => {
-        
-        console.log(guess);
-        
-        console.log(selectedTrack.name)
         if (guesses.length < 5) {
             const newGuess = {
                 index: guesses.length,
@@ -365,8 +365,14 @@ const App = () => {
                 title: guess.name === 'Skipped' ? 'Skipped' : guess.name + " - " + guess.artist,
             };
             setGuesses([...guesses, newGuess]);
-            if (newGuess.status === 'incorrect') {
-                handleSkip();
+            
+            if (newGuess.status === 'correct') 
+                setGameStatus("victory");
+            else {
+                if (guesses.length === 4 )
+                    setGameStatus("defeat");
+                else if (newGuess.status === 'incorrect')
+                    handleSkip();
             }
         }
     };
@@ -426,7 +432,7 @@ const App = () => {
             <div className={"min-h-screen h-screen w-screen bg-paleYellow flex"}>
                 <div className="flex grow flex-col justify-start items-start gap-6 overflow-auto">
                     <Authenticator onAuthenticate={handleAuthenticated} isEnabled={!isAuthenticated}/>
-                    {/*<Result isEnabled={isAuthenticated}/>*/}
+                    <Result song={selectedTrack} status={gameStatus}/>
                     {layout()}
                 </div>
             </div>
