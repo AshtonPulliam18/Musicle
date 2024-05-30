@@ -57,7 +57,7 @@ const App = () => {
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
-    const redirect = "https://musicle-seven.vercel.app";
+    const redirect = "http://localhost:5173/callback"; //"https://musicle-seven.vercel.app";
     const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
 
 
@@ -297,6 +297,7 @@ const App = () => {
             setTarget(progress);
             setProgress(0);
         }
+        player.togglePlay();
         await playSong(selected.id);
     }
     
