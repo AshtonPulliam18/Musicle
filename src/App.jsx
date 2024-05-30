@@ -321,7 +321,9 @@ const App = () => {
     const handlePlay = async () => {
         if (!playing) {
             setPlaying(true);
-            
+            while (!deviceId) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            };
             if (selectedTrack.id === "")
                 await intializePlayback();
             else {
