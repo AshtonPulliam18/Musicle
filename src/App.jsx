@@ -104,8 +104,11 @@ const App = () => {
                     setDeviceId(device_id);
 
                 });
-                
 
+                player.on('playback_error', ({ message }) => {
+                    console.error('Failed to perform playback', message);
+                });
+                
                 await player.connect();
             };
         }
@@ -297,7 +300,7 @@ const App = () => {
             setTarget(progress);
             setProgress(0);
         }
-        player.togglePlay();
+        
         await playSong(selected.id);
     }
     
@@ -305,8 +308,9 @@ const App = () => {
         if (!playing) {
             setPlaying(true);
             
-            if (selectedTrack.id === "")
+            if (selectedTrack.id === "") {
                 await intializePlayback();
+            }
             else {
                 setTarget(progress);
                 setProgress(0);
@@ -409,7 +413,7 @@ const App = () => {
                     <div className={"grow"}>
                         {logo()}
                         <Musicbar progress={progress}/>
-                        {playButton()}
+                        {deviceId ? playButton() : <div/>}
                         <GuessEntry onAddGuess={handleAddGuess} onSkip={handleSkip} token={token}/>
                     </div>
                     <div className={"grow"}>
