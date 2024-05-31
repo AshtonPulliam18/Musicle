@@ -251,7 +251,10 @@ const App = () => {
                     uris: [`spotify:track:${trackId}`]
                 })
             });
-            console.log(await response.json());
+
+            if (!response.ok) {
+                throw new Error(`Could not play song!: ${response.status} ${response.statusText}`);
+            }
         } catch (error) {
             console.error('Fetch error:', error);
         }
