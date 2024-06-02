@@ -318,7 +318,7 @@ const App = () => {
             setTarget(progress);
             setProgress(0);
 
-
+            console.log("Playing!")
             await playSong(selected.id);
         }
     }
@@ -342,6 +342,7 @@ const App = () => {
         }
         
         if ( isIOS && needsInitialPlay) {
+            await initializePlayback();
             setNeedsInitialPlay(false);
             return handlePlay();
         }
