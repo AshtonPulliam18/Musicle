@@ -297,7 +297,6 @@ const App = () => {
         
         let savedTrack = JSON.parse(localStorage.getItem("savedTrack"));
         
-        console.log(`Retrieved Track: ${JSON.stringify(savedTrack.track)}\n-----\n`);
         
         const now = new Date();
         let selected;
