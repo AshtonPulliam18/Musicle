@@ -35,7 +35,7 @@ const App = () => {
     const [selectedTrack, setSelectedTrack] = useState(track);
     const [deviceId, setDeviceId] = useState("");
     const [gameStatus, setGameStatus] = useState("in-progress");
-    
+    const [needsInitialPlay, setNeedsInitialPlay] = useState(true);
     
     const playButtonRotation = useSpring({
         from: {rotate: 0},
@@ -295,7 +295,7 @@ const App = () => {
         
         let savedTrack = JSON.parse(localStorage.getItem("savedTrack"));
         
-        console.log(`Retrieved Track: ${savedTrack}\n-----\n`);
+        console.log(`Retrieved Track: ${JSON.stringify(savedTrack.track)}\n-----\n`);
         
         const now = new Date();
         let selected;
@@ -327,10 +327,11 @@ const App = () => {
         if (!playing) {
             setPlaying(true);
             
-            if (selectedTrack.id === "") {
+            if (selectedTrack.id === "" || needsInitialPlay) {
                 console.log("Initializing!\n-----\n")
                 await player.connect();
                 await initializePlayback();
+                setNeedsInitialPlay(false);
             }
             else {
                 console.log("Song was already selected, toggling play!\n-----\n")
