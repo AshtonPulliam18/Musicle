@@ -57,7 +57,7 @@ const App = () => {
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
-    const redirect =  "https://musicle-seven.vercel.app"; //"http://localhost:5173/callback";
+    const redirect =  "http://localhost:5173/callback"; // "https://musicle-seven.vercel.app"; //"http://localhost:5173/callback";
     const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
 
 
@@ -320,6 +320,7 @@ const App = () => {
             
             if (selectedTrack.id === "") {
                 console.log("Initializing!\n-----\n")
+                await player.connect();
                 await intializePlayback();
             }
             else {
