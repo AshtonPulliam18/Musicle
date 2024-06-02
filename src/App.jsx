@@ -36,6 +36,11 @@ const App = () => {
     const [deviceId, setDeviceId] = useState("");
     const [gameStatus, setGameStatus] = useState("in-progress");
     const [needsInitialPlay, setNeedsInitialPlay] = useState(true);
+
+
+    const isMac = () => {
+        return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    };
     
     const playButtonRotation = useSpring({
         from: {rotate: 0},
@@ -343,7 +348,8 @@ const App = () => {
             }
         }
         
-        if ( isIOS && needsInitialPlay) {
+        if ( (isIOS || isMac()) && needsInitialPlay) {
+            console.log("ON SAFARI");
             await initializePlayback();
             setNeedsInitialPlay(false);
             return handlePlay();
