@@ -175,6 +175,8 @@ const App = () => {
             if (!response.ok) {
                 throw new Error('Failed to transfer playback');
             }
+            console.log(`Response - ${response.status}: ${response.statusText}\n-----\n`);
+                
             
         } catch (error) {
             console.error('Error transferring playback:', error);
@@ -255,6 +257,7 @@ const App = () => {
             if (!response.ok) {
                 throw new Error(`Could not play song!: ${response.status} ${response.statusText}`);
             }
+            console.log(`Response - ${response.status}: ${response.statusText}\n-----\n`);
         } catch (error) {
             console.error('Fetch error:', error);
         }
@@ -284,6 +287,8 @@ const App = () => {
         
         let savedTrack = JSON.parse(localStorage.getItem("savedTrack"));
         
+        console.log(`Retrieved Track: ${savedTrack}\n-----\n`);
+        
         const now = new Date();
         let selected;
         if (savedTrack && now - new Date(savedTrack.timestamp) < 86400000) { // 86400000 ms = 24 hours
@@ -292,9 +297,10 @@ const App = () => {
 
             setTarget(progress);
             setProgress(0);
-            
+            console.log(`Track set from history!\n-----\n`);
         }
         else {
+            console.log(`New Track Needed!\n-----\n`);
             selected = await getRandomSongFromPlaylist(globalTopFiftyId);
             setSelectedTrack(selected);
 
@@ -308,20 +314,22 @@ const App = () => {
     }
     
     const handlePlay = async () => {
+        console.log("Play Hit!\n-----\n")
         if (!playing) {
             setPlaying(true);
             
             if (selectedTrack.id === "") {
+                console.log("Initializing!\n-----\n")
                 await intializePlayback();
             }
             else {
+                console.log("Song was already selected, toggling play!\n-----\n")
                 setTarget(progress);
                 setProgress(0);
                 
                 await player.togglePlay();
             }
         }
-        console.log("Play Hit!")
     };
 
 
