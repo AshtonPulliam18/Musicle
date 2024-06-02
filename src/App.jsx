@@ -264,6 +264,8 @@ const App = () => {
         } catch (error) {
             console.error('Fetch error:', error);
         }
+        console.log("RETURNING PLAY")
+        return;
     };
     
     const SkipTrack = async () => {
