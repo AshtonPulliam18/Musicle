@@ -249,9 +249,9 @@ const App = () => {
     };
 
 
-    const playSong = async (trackId) => {
+    const playSong = async (device_id, trackId) => {
         try {
-            const response = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + deviceId, {
+            const response = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + device_id, {
                 method: 'PUT',
                 headers: {
                     'Authorization': 'Bearer ' + token,
@@ -324,7 +324,7 @@ const App = () => {
         }
         
         if (isMac() || isIOS)
-            await playSong(selected.id);
+            await playSong(device_id, selected.id);
     }
     
     const handlePlay = async () => {
@@ -332,7 +332,7 @@ const App = () => {
         if (!playing) {
             setPlaying(true);
             
-            if (selectedTrack.id === "") {
+            if (false) {
                 await initializePlayback();
             }
             else {
