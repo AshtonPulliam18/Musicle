@@ -222,6 +222,8 @@ const App = () => {
             artist: artist,
             img: selectedAlbumCover
         };
+        
+        console.log(JSON.stringify(selected))
         return selected;
     };
 
