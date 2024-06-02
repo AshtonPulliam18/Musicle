@@ -57,7 +57,7 @@ const App = () => {
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
-    const redirect =  "https://musicle-seven.vercel.app"; //"http://localhost:5173/callback";
+    const redirect =  "https://musicle-seven.vercel.app"; // "http://localhost:5173/callback" ;
     const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
 
 
@@ -102,7 +102,7 @@ const App = () => {
 
                 player.addListener('ready', ({device_id}) => {
                     setDeviceId(device_id);
-
+                    initializePlayback(device_id);
                 });
 
                 player.on('playback_error', ({ message }) => {
@@ -110,6 +110,7 @@ const App = () => {
                 });
                 
                 await player.connect();
+                
             };
         }
     }, [token]);
@@ -282,8 +283,13 @@ const App = () => {
         await player.seek(ms);
     };
     
-    const intializePlayback = async () => {
-        await transferPlayback(deviceId);
+    const initializePlayback = async (device_id = undefined) => {
+        let togglePlay = false;
+        if (!device_id) {
+            device_id = deviceId;
+            togglePlay = true;
+        }
+        await transferPlayback(device_id);
         
         let savedTrack = JSON.parse(localStorage.getItem("savedTrack"));
         
@@ -295,8 +301,6 @@ const App = () => {
             selected = savedTrack.track;
             setSelectedTrack(selected);
 
-            setTarget(progress);
-            setProgress(0);
             console.log(`Track set from history!\n-----\n`);
         }
         else {
@@ -305,12 +309,15 @@ const App = () => {
             setSelectedTrack(selected);
 
             localStorage.setItem("savedTrack", JSON.stringify({ track: selected, timestamp: new Date() }));
-            
-            setTarget(progress);
-            setProgress(0);
         }
         
-        await playSong(selected.id);
+        if (togglePlay) {
+            setTarget(progress);
+            setProgress(0);
+
+
+            await playSong(selected.id);
+        }
     }
     
     const handlePlay = async () => {
@@ -321,7 +328,7 @@ const App = () => {
             if (selectedTrack.id === "") {
                 console.log("Initializing!\n-----\n")
                 await player.connect();
-                await intializePlayback();
+                await initializePlayback();
             }
             else {
                 console.log("Song was already selected, toggling play!\n-----\n")
