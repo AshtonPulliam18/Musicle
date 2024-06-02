@@ -321,6 +321,7 @@ const App = () => {
                 await player.togglePlay();
             }
         }
+        console.log("Play Hit!")
     };
 
 
