@@ -289,7 +289,8 @@ const App = () => {
     
     const initializePlayback = async (device_id = undefined) => {
         let togglePlay = false;
-        if (!device_id) {
+        console.log(device_id);
+        if (device_id === undefined) {
             device_id = deviceId;
             togglePlay = true;
         }
