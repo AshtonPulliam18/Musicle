@@ -330,7 +330,7 @@ const App = () => {
             if (needsInitialPlay) {
                 console.log("Initializing!\n-----\n")
                // await player.connect();
-                playSong(selected.id);
+                await playSong(selectedTrack.id);
                 setNeedsInitialPlay(false);
             }
             else {
