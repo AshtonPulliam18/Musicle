@@ -293,6 +293,7 @@ const App = () => {
         if (device_id === undefined) {
             device_id = deviceId;
             togglePlay = true;
+            console.log("No device provided");
         }
         await transferPlayback(device_id);
         
