@@ -270,6 +270,8 @@ const App = () => {
             console.error('Fetch error:', error);
         }
         console.log("RETURNING PLAY")
+        if (needsInitialPlay)
+            setNeedsInitialPlay(false);
         return;
     };
     
@@ -349,9 +351,8 @@ const App = () => {
         }
         
         if ( (isIOS || isMac()) && needsInitialPlay) {
-            console.log("ON SAFARI");
+            console.log("ON SAFARI: " + needsInitialPlay);
             await initializePlayback();
-            setNeedsInitialPlay(false);
             return handlePlay();
         }
     };
