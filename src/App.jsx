@@ -323,13 +323,8 @@ const App = () => {
             localStorage.setItem("savedTrack", JSON.stringify({ track: selected, timestamp: new Date() }));
         }
         
-        if (togglePlay) {
-            setTarget(progress);
-            setProgress(0);
-
-            console.log("Playing!")
+        if (isMac() || isIOS)
             await playSong(selected.id);
-        }
     }
     
     const handlePlay = async () => {
@@ -338,7 +333,6 @@ const App = () => {
             setPlaying(true);
             
             if (selectedTrack.id === "") {
-                console.log("Initializing!\n-----\n")
                 await initializePlayback();
             }
             else {
@@ -350,11 +344,6 @@ const App = () => {
             }
         }
         
-        if ( (isIOS || isMac()) && needsInitialPlay) {
-            console.log("ON SAFARI: " + needsInitialPlay);
-            await initializePlayback();
-            return handlePlay();
-        }
     };
 
 
