@@ -9,7 +9,6 @@ import record from "./assets/record.png";
 import {useMediaQuery} from "react-responsive";
 import { useSpring, animated } from 'react-spring';
 
-
 const track = {
     id: "",
     name: "",
@@ -35,7 +34,8 @@ const App = () => {
     const [selectedTrack, setSelectedTrack] = useState(track);
     const [deviceId, setDeviceId] = useState("");
     const [gameStatus, setGameStatus] = useState("in-progress");
-    
+
+    const isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
     
     const playButtonRotation = useSpring({
         from: {rotate: 0},
@@ -57,7 +57,7 @@ const App = () => {
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
-    const redirect =  "https://musicle-seven.vercel.app"; //"http://localhost:5173/callback";
+    const redirect =   "http://localhost:5173/callback"; // "https://musicle-seven.vercel.app";;
     const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
 
 
@@ -305,6 +305,10 @@ const App = () => {
         }
         
         await playSong(selected.id);
+        
+        
+        if (isSafari)
+            await playSong(selected.id);
     }
     
     const handlePlay = async () => {
