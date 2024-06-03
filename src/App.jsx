@@ -8,7 +8,6 @@ import Result from './components/Result.jsx';
 import record from "./assets/record.png";
 import {useMediaQuery} from "react-responsive";
 import { useSpring, animated } from 'react-spring';
-import { isIOS } from 'react-device-detect';
 
 const track = {
     id: "",
@@ -35,12 +34,8 @@ const App = () => {
     const [selectedTrack, setSelectedTrack] = useState(track);
     const [deviceId, setDeviceId] = useState("");
     const [gameStatus, setGameStatus] = useState("in-progress");
-    const [needsInitialPlay, setNeedsInitialPlay] = useState(true);
 
-
-    const isMac = () => {
-        return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    };
+    const isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
     
     const playButtonRotation = useSpring({
         from: {rotate: 0},
@@ -62,7 +57,7 @@ const App = () => {
     const client_id = "f13a11c782834762976c38298c0571e7";
     const client_secret = "22e12b8aebcd4479906de80c65c6e14b";
     const auth_endpoint = "https://accounts.spotify.com/authorize";
-    const redirect =   "https://musicle-seven.vercel.app"  ; //"http://localhost:5173/callback"; 
+    const redirect =   "http://localhost:5173/callback"; // "https://musicle-seven.vercel.app";;
     const scopes = "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state"
 
 
@@ -107,7 +102,7 @@ const App = () => {
 
                 player.addListener('ready', ({device_id}) => {
                     setDeviceId(device_id);
-                    initializePlayback(device_id);
+
                 });
 
                 player.on('playback_error', ({ message }) => {
@@ -115,7 +110,6 @@ const App = () => {
                 });
                 
                 await player.connect();
-                
             };
         }
     }, [token]);
@@ -181,8 +175,6 @@ const App = () => {
             if (!response.ok) {
                 throw new Error('Failed to transfer playback');
             }
-            console.log(`Response - ${response.status}: ${response.statusText}\n-----\n`);
-                
             
         } catch (error) {
             console.error('Error transferring playback:', error);
@@ -227,8 +219,6 @@ const App = () => {
             artist: artist,
             img: selectedAlbumCover
         };
-        
-        console.log(JSON.stringify(selected))
         return selected;
     };
 
@@ -249,9 +239,9 @@ const App = () => {
     };
 
 
-    const playSong = async (device_id, trackId) => {
+    const playSong = async (trackId) => {
         try {
-            const response = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + device_id, {
+            const response = await fetch('https://api.spotify.com/v1/me/player/play?device_id=' + deviceId, {
                 method: 'PUT',
                 headers: {
                     'Authorization': 'Bearer ' + token,
@@ -265,14 +255,9 @@ const App = () => {
             if (!response.ok) {
                 throw new Error(`Could not play song!: ${response.status} ${response.statusText}`);
             }
-            console.log(`Response - ${response.status}: ${response.statusText}\n-----\n`);
         } catch (error) {
             console.error('Fetch error:', error);
         }
-        console.log("RETURNING PLAY")
-        if (needsInitialPlay)
-            setNeedsInitialPlay(false);
-        return;
     };
     
     const SkipTrack = async () => {
@@ -294,18 +279,10 @@ const App = () => {
         await player.seek(ms);
     };
     
-    const initializePlayback = async (device_id = undefined) => {
-        let togglePlay = false;
-        console.log(device_id);
-        if (device_id === undefined) {
-            device_id = deviceId;
-            togglePlay = true;
-            console.log("No device provided");
-        }
-        await transferPlayback(device_id);
+    const intializePlayback = async () => {
+        await transferPlayback(deviceId);
         
         let savedTrack = JSON.parse(localStorage.getItem("savedTrack"));
-        
         
         const now = new Date();
         let selected;
@@ -313,37 +290,42 @@ const App = () => {
             selected = savedTrack.track;
             setSelectedTrack(selected);
 
-            console.log(`Track set from history!\n-----\n`);
+            setTarget(progress);
+            setProgress(0);
+            
         }
         else {
-            console.log(`New Track Needed!\n-----\n`);
             selected = await getRandomSongFromPlaylist(globalTopFiftyId);
             setSelectedTrack(selected);
 
             localStorage.setItem("savedTrack", JSON.stringify({ track: selected, timestamp: new Date() }));
+            
+            setTarget(progress);
+            setProgress(0);
         }
         
-        if (isMac() || isIOS)
-            await playSong(device_id, selected.id);
+        await playSong(selected.id);
+        
+        
+        if (isSafari)
+            await playSong(selected.id);
     }
     
     const handlePlay = async () => {
-        console.log("Play Hit!\n-----\n")
         if (!playing) {
             setPlaying(true);
             
-            if (false) {
-                await initializePlayback();
+            if (selectedTrack.id === "") {
+                await intializePlayback();
             }
             else {
-                console.log("Song was already selected, toggling play!\n-----\n")
                 setTarget(progress);
                 setProgress(0);
                 
                 await player.togglePlay();
             }
         }
-        
+        console.log("Play Hit!")
     };
 
 
